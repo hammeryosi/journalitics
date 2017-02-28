@@ -27,7 +27,9 @@ class scraper:
             n = min(2, len(pars))
             summary = ' '.join([p.text for p in pars[:n]])
             summary = re.sub('\n', ' ', summary)
+            summary = re.sub('\r', '', summary)
             summary = re.sub('\t', '', summary)
+            summary = re.sub('^ ', '', summary)
         except:
             pass
         return {'title': title,

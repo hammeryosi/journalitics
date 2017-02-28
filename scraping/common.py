@@ -1,4 +1,3 @@
-import time
 import datetime
 import pandas as pd
 from NYT import scraper as NYTsc
@@ -18,7 +17,8 @@ def nextDay(date):
 
 retryTime = 3
 
-def headLinesInRange(startDate, endDate, journal, saveEvery = 30,
+def headLinesInRange(startDate, endDate, journal,
+                     saveEvery = 30,
                      saveTo = 'titlesScraped.csv'):
     scraper = scrapers[journal]()
     d = startDate
@@ -30,9 +30,12 @@ def headLinesInRange(startDate, endDate, journal, saveEvery = 30,
         count += 1
         d = nextDay(d)
         if count % saveEvery == 0:
-            pd.DataFrame(headLines).to_csv(saveTo, encoding='utf8')
+            pd.DataFrame(headLines).to_csv(saveTo,
+                                           encoding='utf8',
+                                           index=False)
     dat = pd.DataFrame(headLines)
     dat.to_csv(saveTo, encoding='utf8')
-    print('done! scraped ' + str(len(headLines)) + ' headlines')
+    print('done! scraped ' + str(len(headLines)) +
+          ' headlines')
     return dat
 

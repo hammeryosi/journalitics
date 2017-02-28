@@ -1,8 +1,9 @@
+import time
 import datetime
 import pandas as pd
-from .NYT import scraper as NYTsc
-from .WSJ import scraper as WSJsc
-from .NYDN import scraper as NYDNsc
+from NYT import scraper as NYTsc
+from WSJ import scraper as WSJsc
+from NYDN import scraper as NYDNsc
 
 
 scrapers = {'NYT': NYTsc,
@@ -14,6 +15,8 @@ def nextDay(date):
     return format(datetime.date(d[0], d[1], d[2]) +
                   datetime.timedelta(days=1),
                   '%Y-%m-%d')
+
+retryTime = 3
 
 def headLinesInRange(startDate, endDate, journal, saveEvery = 30,
                      saveTo = 'titlesScraped.csv'):

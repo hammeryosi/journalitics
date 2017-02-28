@@ -3,11 +3,13 @@ import pandas as pd
 from NYT import scraper as NYTsc
 from WSJ import scraper as WSJsc
 from NYDN import scraper as NYDNsc
+from NYP import  scraper as NYPsc
 
 
 scrapers = {'NYT': NYTsc,
             'WSJ': WSJsc,
-            'NYDN': NYDNsc}
+            'NYDN': NYDNsc,
+            'NYP': NYPsc}
 
 def nextDay(date):
     d = [int(n) for n in date.split('-')]

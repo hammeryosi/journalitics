@@ -13,28 +13,35 @@ class scraper:
         summary = re.sub('  *', ' ', re.sub('\n ', '', summary))
         summary = re.sub('^ ', '', summary)
         link = el.h2.a['href']
-        page = requests.get(link).text
-        soup = BeautifulSoup(page, 'lxml')
-        byline = soup.find(class_='byline')
-        if byline is None:
-            author = ''
-        else:
-            names = byline.find_all(itemprop='name')
-            if names is not None:
-                author = ' and '.join([n.text for n in names])
+        try:
+            page = requests.get(link).text
+            soup = BeautifulSoup(page, 'lxml')
+            byline = soup.find(class_='byline')
+            if byline is None:
+                author = ''
             else:
-                author = re.sub('\n', '', byline.text)
-        cat = soup.find(class_='category')
-        if cat is not None:
-            As = cat.find_all('a')
-            section = ','.join([a.text for a in As])
-            section = re.sub('\n', '', section)
-            section = re.sub('  +', '', section)
-        else:
+                names = byline.find_all(itemprop='name')
+                if names is not None:
+                    author = ' and '.join([n.text for n in names])
+                else:
+                    author = re.sub('\n', '', byline.text)
+            cat = soup.find(class_='category')
+            if cat is not None:
+                As = cat.find_all('a')
+                section = ','.join([a.text for a in As])
+                section = re.sub('\n', '', section)
+                section = re.sub('  +', '', section)
+            else:
+                section = ''
+        except:
+            print('cant reach articel page: ' + link)
+            author = ''
             section = ''
+            pass
         return {'link': link, 'title': title, 'author': author,
                 'section': section, 'summary': summary,
                 'journal': journal}
+
 
     def getTitles(self, date):
         # date format: yyyy-mm-dd

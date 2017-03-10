@@ -1,0 +1,36 @@
+.modern-header {
+	background-image: url(../images/newspapers3.jpg);
+	padding-top: 15px;
+	color: whitesmoke;
+	text-align: center;
+}
+
+#under-logo {
+	padding-top: 7px;
+	padding-bottom: 10px;
+	font-size: 20px;
+	text-shadow: 3px 2px black;
+}
+
+.navbar .navbar-nav {
+  	display: inline-block;
+  	float: none;
+  	vertical-align: top;
+}
+
+.navbar .navbar-collapse {
+	text-align: center;
+}
+
+.modern-nav{
+	background-color: rgba(33,21,22,0.75);
+}
+
+.page-content {
+	text-align: center;
+}
+
+body {
+	background-color: floralwhite;
+}
+

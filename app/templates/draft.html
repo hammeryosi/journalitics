@@ -1,27 +1,55 @@
 <!doctype html>
-<html>
-<head>
+<html><head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
  	<title>Draft Page</title>
  	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
  	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster">
+ 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Allerta+Stencil">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+	<link rel="stylesheet" href="../static/css/nameCountChart.css">
+ 	<script src="../static/scripts/d3/d3.min.js"></script>
 <style>
 .w3-lobster {
     font-family: "Lobster", serif;
 }
+.w3-allerta {
+    font-family: "Allerta Stencil", Sans-serif;
+}
 </style>
 </head>
 <body>
-<div class="w3-container w3-sand w3-lobster w3-xxlarge w3-center">
-<img src="../static/images/logo2.png" height="60px" style="margin-top: 10px"><br>
-	Analyzing Newspaper Content
-</div>
-<div class="w3-bar w3-black">
-	<a class="w3-bar-item w3-button w3-mobile" href="#">About</a>
-	<a class="w3-bar-item w3-button w3-mobile" href="#">Tool 1</a>
-	<a class="w3-bar-item w3-button w3-mobile" href="#">Tool 3</a>
-	
-</div>
+    <div class="w3-container w3-sand w3-center">
+        <header class="w3-container w3-lobster w3-xxlarge"
+        style="margin-bottom: 25px; margin-top: 25px;">
+            <img src="../static/images/logo2.png" height="60px" style="margin-top: 10px"><br>
+            Analyzing Newspaper Content
+        </header>
+        <div class="w3-bar w3-allerta
+            w3-border-bottom w3-border-brown w3-border-top">
+	        <a class="w3-bar-item w3-button w3-mobile w3-large" href="#">About</a>
+	        <a class="w3-bar-item w3-button w3-mobile w3-large" href="#">Tool 1</a>
+	        <a class="w3-bar-item w3-button w3-mobile w3-large" href="#">Tool 3</a>
+        </div>
+        <div class="w3-container">
+            <div class="w3-container">
+                <button class="w3-btn w3-round w3-text-shadow"
+                        onclick="countBarChart(data, elementId)">Go!</button>
+            </div>
+            <div class="w3-cell-row" style="border-spacing:16px">
+                <div class="w3-card-4 w3-cell w3-mobile"
+                    style="background-color: white;">
+                    <h2>New York Times</h2>
+                    <svg class="chart" id="chart"></svg>
+                </div>
+                <div class="w3-card-4 w3-cell w3-mobile"
+                    style="background-color: white;">
+                    <h2>New York Times</h2>
+                    <svg class="chart" id="chart"></svg>
+                </div>
+            </div>
+            <script type="text/javascript" src="../static/scripts/draft.js"></script>
+        </div>
+    </div>
 </body>
 </html>

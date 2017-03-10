@@ -1,0 +1,19 @@
+.chart {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.chart rect {
+  fill: red;
+}
+
+.chart text {
+  fill: black;
+  font: 14px sans-serif;
+  text-anchor: start;
+}
+
+.bar-name-label {
+    font-weight: bold !important;
+    text-anchor: end !important;
+}

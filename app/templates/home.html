@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set active_page = 'home' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<p>Welcome to Journalitics!</p>
+    This is a project I prepared during my fellowship in
+<a href="https://www.thedataincubator.com/">The Data Incubator</a>.
+    The idea is to use the Stanford natural language processing tool
+<a href="http://stanfordnlp.github.io/CoreNLP/">coreNLP</a> to study the content of major newspapers.
+
+<p>
+    In the current version, I analyzed headlines from the 4 largest newspapers in New York,
+    along with article summaries. I extracted the names of people appearing in the text using
+    coreNLP's <a href="http://stanfordnlp.github.io/CoreNLP/ner.html">
+    Named Entity Recognition annotator</a>. You can see the top names mentioned in
+    article headlines for a chosen time range, and the relative frequencies in which they appear
+    in each paper.
+</p>
+
+<p>Enjoy!</p>
+
+<p>Yosi Hammer</p>
+{% endblock content %}

@@ -7,6 +7,9 @@ import pandas as pd
 # the name list
 cutoff = 5
 
+singleWordNames = set(["Rihanna", "Prince", "Beyoncé", "Madonna"])
+excludeNames = set(["boko haram", "charlie hebdo"])
+
 def makeCount(col):
     s = {}
     for st in rawTable['persons_raw']:
@@ -18,61 +21,60 @@ def makeCount(col):
                     s[n] = 1
     return s
 
-def partialNames(nameCount):
-    parNames = {}
-    for n in nameCount.keys():
-        parts = n.split()
-        l = len(parts)
-        # general partial names
-        if l > 1:
-            for i in range(l):
-                for j in range(i+1,l+1):
-                    p = ' '.join(parts[i:j])
-                    if p in nameCount.keys() and p != n:
-                        if p in parNames.keys():
-                            parNames[p].add(n)
-                        else:
-                            parNames[p] = set([n])
-                    # for middle names
-                    if l > 2:
-                        p = ' '.join([parts[0], parts[l-1]])
-                        if p in nameCount.keys() and p != n:
-                            if p in parNames.keys():
-                                parNames[p].add(n)
-                            else:
-                                parNames[p] = set([n])
-    for p in parNames.keys():
-        parNames[p] = sorted(list(parNames[p]), key=lambda x: nameCount[x], reverse=True)
-    return parNames
-
-
-def makeConvertDic(parNames):
+# trying to fix coreNLP mistakes
+def convertDic(nameCount):
     convert = {}
-    for n in parNames.keys():
-        if len(n.split()) == 1:
-            mostCom = parNames[n][0].split()
-            # ignore first names
-            if mostCom[0] == n:
-                convert[n] = None
-            # convert last names to most common full name
-            if  mostCom[len(mostCom)-1] == n:
-                convert[n] = ' '.join(mostCom)
-        # reduce long names to two words
-        if len(n.split()) > 1:
-            for long in parNames[n]:
-                convert[long] = n
+    for n in nameCount.keys():
+        # check all parts of multi-word names
+        words = n.split()
+        l = len(words)
+        parts = []
+        if l>1:
+            for i in range(l):
+                for j in range(i+1, l+1):
+                    part = ' '.join(words[i:j])
+                    if part != n:
+                        parts.append(part)
+                    if j-i > 1 and j < l:
+                        parts.append(words[i] +
+                                     ' ' + words[j])
+            for part in parts:
+                if part in nameCount.keys():
+                    if (nameCount[part] > nameCount[n] and
+                            (len(part.split()) > 1 or
+                            part in singleWordNames)):
+                        # part is more common than whole
+                        # name
+                        if n in convert.keys():
+                            convert[n].add(part)
+                        else:
+                            convert[n] = set([part])
+                    elif (nameCount[n] > nameCount[part] and
+                        part != n.split()[0]):
+                        # whole name is more common
+                        # and it's not a first name
+                        if part in convert.keys():
+                            if (max([nameCount[x] for x in convert[part]]) >
+                                    nameCount[n]):
+                                convert[part] = set([n])
+                        else:
+                            convert[part] = set([n])
     return convert
 
-def reduceCount(nameCount, parNames, convert):
+
+
+
+def reduceCount(nameCount, convert):
     reducedNameCount = {}
     for n in nameCount.keys():
         if n in convert.keys():
-            if convert[n] in reducedNameCount.keys():
-                reducedNameCount[convert[n]] += nameCount[n]
-            else:
-                if convert[n] is not None:
-                    reducedNameCount[convert[n]] = nameCount[n]
-        else:
+            for n1 in convert[n]:
+                if n1 in reducedNameCount.keys():
+                    reducedNameCount[n1] += nameCount[n]
+                else:
+                    reducedNameCount[n1] = nameCount[n]
+        elif ((len(n.split()) > 1 or n in singleWordNames) and
+                n not in excludeNames):
             reducedNameCount[n] = nameCount[n]
     return(reducedNameCount)
 
@@ -84,11 +86,11 @@ def makeCommonNameCol(col, convert, common):
             newNames = []
             for n in oldNames:
                 if n in convert.keys():
-                    n1 = convert[n]
-                else:
-                    n1 = n
-                if n1 in common:
-                    newNames.append(n1)
+                    for n1 in convert[n]:
+                        if n1 in common:
+                            newNames.append(n1)
+                elif n in common:
+                    newNames.append(n)
             newCol.append(','.join(set(newNames)))
         else:
             newCol.append('')
@@ -114,14 +116,14 @@ def nameCounts(table):
                          for n in names]
     return pd.DataFrame(entries)
 
-rawTable = pd.read_csv('../data/nlpRaw.csv')
+rawTable = pd.read_csv('../data/allHeadlinesNLPRaw.csv')
 nameCount = makeCount(rawTable['persons_raw'])
-parNames = partialNames(nameCount)
 print('coreNLP found ' + str(len(nameCount)) +
       ' unique names')
-convert = makeConvertDic(parNames)
-reducedCount = reduceCount(nameCount, parNames,
-                           convert)
+convert = convertDic(nameCount)
+reducedCount = reduceCount(nameCount, convert)
+convert = convertDic(reducedCount)
+reducedCount = reduceCount(reducedCount, convert)
 print('reduced to ' + str(len(reducedCount)) +
       ' after searching partial names')
 commonNames = pd.DataFrame.from_dict(reducedCount,
@@ -134,9 +136,9 @@ print('after cutoff ' + str(len(commonNames)) + ' left')
 print('single word names remaining: ' +
       str(sum([len(x.split()) == 1
                for x in commonNames.index])))
-print('removing them..')
-commonNames = commonNames[[len(x.split()) > 1
-                 for x in commonNames.index]]
+print([x for x in commonNames.index
+       if len(x.split()) == 1])
+
 commonNames.to_csv('../data/commonNames.csv',
               encoding='utf8')
 

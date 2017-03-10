@@ -2,31 +2,17 @@ from pycorenlp import StanfordCoreNLP
 nlp = StanfordCoreNLP('http://localhost:9000')
 import pandas as pd
 from functools import reduce
-
-headlinesData = pd.read_csv('../data/headlines.csv')
-
+import sys
+args = sys.argv
 
 def keywordsInSen(sen):
-    words = [(t['lemma'], t['index'], t['ner']) for t in sen['tokens']
-             if t['ner'] != 'O']
-    reducedWords = []
-    if len(words) == 0:
-        return []
-    parWord = words[0]
-    if len(words) > 1:
-        for w in words[1:]:
-            if w[1] == parWord[1] + 1 and w[2] == parWord[2]:
-                parWord = (parWord[0] + ' ' + w[0], parWord[1] + 1, parWord[2])
-            else:
-                reducedWords.append((parWord[0], parWord[2]))
-                parWord = w
-        reducedWords.append((parWord[0], parWord[2]))
-    return reducedWords
+    return [(m['text'], m['ner'])
+            for m in sen['entitymentions']]
 
 
 def keywordsInTxt(txt):
     an = nlp.annotate(txt, properties={
-        'annotators': 'ner',
+        'annotators': 'entitymentions',
         'outputFormat': 'json'
     })
     wordLists = [keywordsInSen(s) for s in an['sentences']]
@@ -61,6 +47,9 @@ def extractFromHeadlines(headlineTable):
         done += batchSize
     return pd.DataFrame(keywords)
 
+src = args[1]
+target = args[2]
+headlinesData = pd.read_csv(src)
 resultTable = extractFromHeadlines(headlinesData)
 allData = pd.concat([headlinesData, resultTable], axis=1)
-allData.to_csv('resultTable.csv', index = False)
+allData.to_csv(target, index=False, encoding='utf8')

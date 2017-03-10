@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% set active_page = 'links' %}
+{% block title %}Links{% endblock %}
+{% block content %}
+<h3>Newspaper archives:</h3>
+<ul style="list-style: none;">
+    <li><a href="http://www.nytimes.com/ref/membercenter/nytarchive.html"
+    target="_blank">New York Times</a></li>
+    <li><a href="http://www.wsj.com/public/page/archive.html"
+    target="_blank">Wall Street Journal</a></li>
+    <li><a href="http://www.nydailynews.com/archives"
+    target="_blank">New York Daily News</a></li>
+    <li><a href="http://pqasb.pqarchiver.com/nypost/faq.html"
+    target="_blank">New York Post</a> </li>
+</ul>
+<h3>Other links:</h3>
+<ul style="list-style: none;">
+    <li><a href="http://stanfordnlp.github.io/CoreNLP/"
+    target="_blank">Stanford coreNLP</a></li>
+    <li><a href="https://www.thedataincubator.com/"
+    target="_blank">The Data Incubator</a></li>
+</ul>
+{% endblock content %}

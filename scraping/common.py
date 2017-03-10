@@ -20,7 +20,7 @@ def nextDay(date):
 retryTime = 3
 
 def headLinesInRange(startDate, endDate, journal,
-                     saveEvery = 30,
+                     saveEvery = 1,
                      saveTo = 'titlesScraped.csv'):
     scraper = scrapers[journal]()
     d = startDate

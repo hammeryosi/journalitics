@@ -4,12 +4,16 @@ from NYT import scraper as NYTsc
 from WSJ import scraper as WSJsc
 from NYDN import scraper as NYDNsc
 from NYP import  scraper as NYPsc
+from LAT import  scraper as LATsc
+from ND import scraper as NDsc
 
 
 scrapers = {'NYT': NYTsc,
             'WSJ': WSJsc,
             'NYDN': NYDNsc,
-            'NYP': NYPsc}
+            'NYP': NYPsc,
+            'LAT': LATsc,
+            'ND': NDsc}
 
 def nextDay(date):
     d = [int(n) for n in date.split('-')]

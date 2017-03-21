@@ -27,11 +27,18 @@ def keywordsInTxt(txt):
 def keywordsInRow(tableRow):
     title = tableRow['title']
     summary = tableRow['summary']
+    text = ''
+    if not pd.isnull(title):
+        text += title
     if not pd.isnull(summary):
-        text = title + ' ' + summary
-    else:
-        text = title
-    return keywordsInTxt(text)
+        text += ' ' + summary
+    try:
+        return keywordsInTxt(text)
+    except:
+        print('problem in row: ')
+        print(tableRow)
+        return {}
+
 
 
 def extractFromHeadlines(headlineTable):
@@ -45,6 +52,10 @@ def extractFromHeadlines(headlineTable):
                      for i in range(done, min(done + batchSize, l))]
         print(str(len(keywords)) + ' of ' + str(l) + ' done')
         done += batchSize
+        hData = headlineTable[0:done]
+        rData = pd.DataFrame(keywords)
+        aData = pd.concat([hData, rData], axis=1)
+        aData.to_csv(target, index=False, encoding='utf8')
     return pd.DataFrame(keywords)
 
 src = args[1]

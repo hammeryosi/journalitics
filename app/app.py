@@ -10,11 +10,15 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/people-for-time-range_<start>_<end>')
+@app.route('/name-count-for-time-range_<start>_<end>')
 def getCountsPerTimeRange(start, end):
     data = fetch.getTopNameCount(start, end)
     return jsonify(result=data)
 
+@app.route('/name-list-for-time-range_<start>_<end>_<n>')
+def getNamesForTimeRange(start, end, n):
+    data = fetch.getTopNames(start, end, n)
+    return jsonify(result=data)
 
 @app.route('/time-range')
 def timeRangeSearch():

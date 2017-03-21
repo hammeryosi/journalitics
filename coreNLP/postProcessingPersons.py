@@ -7,25 +7,31 @@ import pandas as pd
 # the name list
 cutoff = 5
 
-singleWordNames = set(["Rihanna", "Prince", "Beyoncé", "Madonna"])
-excludeNames = set(["boko haram", "charlie hebdo"])
+singleWordNames = set(["rihanna", "prince", "beyoncé", "madonna", "banksy",
+                       "rembrandt", "buddha", "debussy", "molière", "plato",
+                       "shakespeare", "lorde", "gandhi"])
+excludeNames = set(["boko haram", "charlie hebdo", " "])
+manualConverts = {'jay-z': 'jay z', 'jesus': 'jesus christ', "beyonce": "beyoncé"}
 
 def makeCount(col):
     s = {}
     for st in rawTable['persons_raw']:
         if not pd.isnull(st):
             for n in st.split(','):
+                n = n.lower()
                 if n in s.keys():
                     s[n] += 1
                 else:
                     s[n] = 1
     return s
 
+
 # trying to fix coreNLP mistakes
 def convertDic(nameCount):
     convert = {}
     for n in nameCount.keys():
         # check all parts of multi-word names
+        n = n.lower()
         words = n.split()
         l = len(words)
         parts = []
@@ -50,9 +56,11 @@ def convertDic(nameCount):
                         else:
                             convert[n] = set([part])
                     elif (nameCount[n] > nameCount[part] and
-                        part != n.split()[0]):
-                        # whole name is more common
-                        # and it's not a first name
+                            part != words[0] and
+                            words[l-1] not in ['jr.', 'junior']):
+                        # whole name is more common than part
+                        # and part is not a first name
+                        # and last word in full name is not Jr.
                         if part in convert.keys():
                             if (max([nameCount[x] for x in convert[part]]) >
                                     nameCount[n]):
@@ -73,7 +81,7 @@ def reduceCount(nameCount, convert):
                     reducedNameCount[n1] += nameCount[n]
                 else:
                     reducedNameCount[n1] = nameCount[n]
-        elif ((len(n.split()) > 1 or n in singleWordNames) and
+        elif (#(len(n.split()) > 1 or n in singleWordNames) and
                 n not in excludeNames):
             reducedNameCount[n] = nameCount[n]
     return(reducedNameCount)
@@ -82,6 +90,7 @@ def makeCommonNameCol(col, convert, common):
     newCol = []
     for st in col:
         if not pd.isnull(st):
+            st = st.lower()
             oldNames = st.split(',')
             newNames = []
             for n in oldNames:
@@ -116,11 +125,12 @@ def nameCounts(table):
                          for n in names]
     return pd.DataFrame(entries)
 
-rawTable = pd.read_csv('../data/allHeadlinesNLPRaw.csv')
+rawTable = pd.read_csv('../data/headlines2012-2016NLPRaw.csv')
 nameCount = makeCount(rawTable['persons_raw'])
 print('coreNLP found ' + str(len(nameCount)) +
       ' unique names')
 convert = convertDic(nameCount)
+convert.update(manualConverts)
 reducedCount = reduceCount(nameCount, convert)
 convert = convertDic(reducedCount)
 reducedCount = reduceCount(reducedCount, convert)
@@ -133,12 +143,14 @@ commonNames = commonNames[commonNames['count'] > cutoff]
 commonNames = commonNames.sort_values(by='count',
                             ascending=False)
 print('after cutoff ' + str(len(commonNames)) + ' left')
+remainingSingle = [x for x in commonNames.index
+       if len(x.split()) == 1 and x not in singleWordNames]
 print('single word names remaining: ' +
-      str(sum([len(x.split()) == 1
-               for x in commonNames.index])))
-print([x for x in commonNames.index
-       if len(x.split()) == 1])
-
+      str(len(remainingSingle)))
+print(remainingSingle)
+print('removing them..')
+mask = commonNames.index.isin(remainingSingle)
+commonNames = commonNames[~mask]
 commonNames.to_csv('../data/commonNames.csv',
               encoding='utf8')
 
@@ -148,10 +160,11 @@ rawTable['common_names'] = (
                       commonNames.index))
 rawTable.to_csv('../data/headlinesFull.csv', index=False,
                 encoding='utf8')
-
+print('making daily counts...')
 countTable = nameCounts(rawTable)
 countTable.to_csv('../data/nameCounts.csv',
                   index=False, encoding='utf8')
+print('done!')
 
 
 

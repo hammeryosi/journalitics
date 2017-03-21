@@ -32,7 +32,7 @@ function makeBarPlots() {
     $("#plot-block").empty();
     var startDate = $("#start-date-input").val(),
         endDate = $("#end-date-input").val(),
-        url = $SCRIPT_ROOT + "/people-for-time-range_" +
+        url = $SCRIPT_ROOT + "/name-count-for-time-range_" +
             startDate + "_" + endDate;
     if (startDate != "" && endDate != "" && endDate >= startDate) {
         $("#loading-anim").show();

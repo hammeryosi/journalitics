@@ -41,7 +41,9 @@
                         <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             {% for href, id, caption in dropdown %}
-                            <li><a {% if id == active_page %} class="active" {% endif %} href="{{href}}">{{caption}}</a></li>
+                            <li><a class="dropdown-item
+                            {% if id == active_page %} active{% endif %}"
+                                   href="{{href}}">{{caption}}</a></li>
                             {% endfor %}
                         </ul>
                     </li>

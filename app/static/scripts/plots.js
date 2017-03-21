@@ -96,20 +96,22 @@ function simpleCountBarPlot(parentElementId, data, orient) {
     else {
         countText.attr("transform", "translate(5,-3) rotate(-45)");
         nameText.attr("transform", function(d) {
-                return "translate(12," + (barLengthScale(d.count) + 5) + ") " + "rotate(-70)";
+                return "translate(10," + (barLengthScale(d.count) + 5) + ") " + "rotate(-70)";
             })
             .style("text-anchor", "end");
     }
 }
 
 function comparePlot(data, parentElementId) {
-   var tableLength = data.length,
-       chartWidth = $("#" + parentElementId).width(),
+   var chartWidth = $("#" + parentElementId).width(),
        chartHeight = 350,
-       namePadding = 140;
+       namePadding = 140,
+       topMargin = 20,
+       leftMargin = 30,
+       rightMargin = 40;
 
    var x0 = d3.scaleBand()
-       .range([0, chartWidth - 40])
+       .range([leftMargin, chartWidth - leftMargin - rightMargin])
        .paddingInner(0.1);
    var uniqueNames = Array.from(new Set(data.map(function(x) {return x.name;})));
    x0.domain(uniqueNames);
@@ -122,7 +124,7 @@ function comparePlot(data, parentElementId) {
        .range([0, x0.bandwidth()]);
 
    var y = d3.scaleLinear()
-    .range([0, chartHeight - namePadding])
+    .range([0, chartHeight - namePadding - topMargin])
     .domain([0,1]);
 
    var z = d3.scaleOrdinal()
@@ -135,12 +137,38 @@ function comparePlot(data, parentElementId) {
        .attr("height", chartHeight)
        .style("padding-left", "30px");
 
+   chart.append("line")
+        .attr("x1", x0(data[0].name) - 5)
+        .attr("y1", topMargin +(chartHeight-namePadding - topMargin)/2)
+        .attr("y2", topMargin + (chartHeight-namePadding - topMargin)/2)
+        .attr("x2", chartWidth - leftMargin - rightMargin)
+        .attr("stroke", "grey")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", 5);
+   chart.append("text")
+       .text("0.5")
+       .attr("x", 0)
+       .attr("y", topMargin + (chartHeight-namePadding - topMargin)/2 + 5);
+
+   chart.append("line")
+        .attr("x1", x0(data[0].name) - 5)
+        .attr("y1", topMargin)
+        .attr("y2", topMargin)
+        .attr("x2", chartWidth - leftMargin - rightMargin)
+        .attr("stroke", "grey")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", 5);
+   chart.append("text")
+       .text("1.0")
+       .attr("x", 0)
+       .attr("y",topMargin + 5);
+
    var barGroups = chart.selectAll("g")
        .data(data)
        .enter()
        .append("g")
             .attr("transform", function(d) {
-                return "translate(" + x0(d.name) + ",0)";
+                return "translate(" + x0(d.name) + "," + topMargin + ")";
             });
 
    barGroups.append("rect")
@@ -149,14 +177,15 @@ function comparePlot(data, parentElementId) {
        })
        .attr("width", x1.bandwidth())
        .attr("height", function(d) {
-           return y(d.rel);
+           return y(d.freq);
        })
        .attr("y", function(d) {
-           return chartHeight - namePadding - y(d.rel);
+           return chartHeight - namePadding - y(d.freq) - topMargin;
        })
        .attr("fill", function(d) {
            return z(d.journal);
        });
+
 
    barGroups.append("text")
        .text(function (d) {
@@ -165,7 +194,7 @@ function comparePlot(data, parentElementId) {
        .attr("transform", function(d) {
                 return "translate(" +
                     (x0.bandwidth()/2 + 4) + "," +
-                    (chartHeight - namePadding + 10) +
+                    (chartHeight - namePadding - topMargin + 10) +
                     ") " + "rotate(-70)";
             })
        .style("text-anchor", "end")
@@ -174,6 +203,13 @@ function comparePlot(data, parentElementId) {
 
    var legend = chart.append("g")
        .attr("transform", "translate(" + (chartWidth-120) +",0)");
+
+   legend.append("rect")
+       .attr("width", 80)
+       .attr("height", 20 + 20 * journals.length)
+       .attr("x", -5)
+       .attr("y", -5)
+       .attr("fill", "white");
 
    var legendEnts = legend.selectAll("g")
        .data(journals)
